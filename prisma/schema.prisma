@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  COORDINATOR
+  STUDENT
+}
+
+model User {
+  id            String   @id @default(cuid())
+  username      String   @unique
+  passwordHash  String
+  role          Role
+  totpSecret    String?  // encrypted, nullable until 2FA is enabled
+  totpEnabled   Boolean  @default(false)
+  studentId     String?  @unique // FK to Student (required when role=STUDENT)
+  student       Student? @relation(fields: [studentId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Student {
+  id          String   @id @default(cuid())
+  name        String
+  usn         String   @unique
+  department  String   @default("CSE")
+  section     String   @default("A")
+  batch       Int      @default(2028)
+  user        User?
+  gdEntries   GdEntry[]
+  attendances AttendanceRecord[]
+  createdAt   DateTime @default(now())
+}
+
+model GdSession {
+  id        String    @id @default(cuid())
+  topic     String
+  date      DateTime  @default(now())
+  batches   GdBatch[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model GdBatch {
+  id          String    @id @default(cuid())
+  batchNumber Int
+  sessionId   String
+  session     GdSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  entries     GdEntry[]
+}
+
+model GdEntry {
+  id          String   @id @default(cuid())
+  batchId     String
+  batch       GdBatch  @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id])
+  remarks     String   @default("")   // combined comment chips + manual
+  chips       String[] @default([])   // array of selected chip labels
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AttendanceSession {
+  id        String             @id @default(cuid())
+  date      DateTime           @default(now())
+  title     String?
+  records   AttendanceRecord[]
+  createdAt DateTime           @default(now())
+}
+
+model AttendanceRecord {
+  id        String            @id @default(cuid())
+  sessionId String
+  session   AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student           @relation(fields: [studentId], references: [id])
+  present   Boolean           @default(false)
+
+  @@unique([sessionId, studentId])
+}
+
+model CommentChip {
+  id    String @id @default(cuid())
+  label String @unique
+  order Int    @default(0)
+}

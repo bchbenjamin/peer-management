@@ -1,0 +1,20 @@
+runtime: nodejs20
+instance_class: F1
+
+env_variables:
+  NODE_ENV: "production"
+  DATABASE_URL: "REPLACE_WITH_NEON_POOLED_DATABASE_URL"
+  DIRECT_URL: "REPLACE_WITH_NEON_DIRECT_DATABASE_URL"
+  MASTER_USER_ID: "bchbenjamin"
+  MASTER_PASSWORD: "REPLACE_WITH_SECURE_MASTER_PASSWORD"
+  JWT_SECRET: "REPLACE_WITH_THE_JWT_SECRET_FROM_LOCAL_ENV_OR_A_NEW_32_BYTE_SECRET"
+  # Add after first deployed master authenticator setup, then redeploy:
+  # MASTER_TOTP_SECRET: "REPLACE_WITH_BASE32_SECRET_FROM_SETUP_PAGE"
+
+automatic_scaling:
+  max_instances: 2
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always

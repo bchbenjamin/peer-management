@@ -1,0 +1,100 @@
+@import "tailwindcss";
+@import "../../theme.css";
+
+:root {
+  color-scheme: dark;
+  --color-absolute-zero: var(--color-porcelain);
+  --color-canvas-white: var(--color-porcelain);
+  --color-silver-mist: var(--color-storm-cloud);
+  --color-light-gray: var(--color-charcoal-grey);
+  --surface-absolute-zero: var(--color-pitch-black);
+  --surface-canvas-white: var(--color-pitch-black);
+  --surface-light-gray: var(--color-deep-slate);
+  --text-body-lg: var(--text-body);
+  --leading-body-lg: var(--leading-body);
+  --tracking-heading-sm: var(--tracking-heading);
+  --text-heading-sm: var(--text-heading);
+  --leading-heading-sm: var(--leading-heading);
+  --text-subheading: 17px;
+  --leading-subheading: 1.47;
+  --tracking-heading: var(--tracking-heading-lg);
+}
+
+body {
+  @apply bg-[var(--color-pitch-black)] text-[var(--color-porcelain)] font-[var(--font-inter-variable)] antialiased;
+}
+
+::selection {
+  background: var(--color-neon-lime);
+  color: var(--color-pitch-black);
+}
+
+select,
+textarea {
+  background: var(--color-graphite);
+  color: var(--color-porcelain);
+  border-color: var(--color-charcoal-grey);
+}
+
+select:focus,
+textarea:focus {
+  outline: 2px solid color-mix(in srgb, var(--color-neon-lime) 65%, transparent);
+  outline-offset: 1px;
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(56px) scale(0.98);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes reveal-soft {
+  from {
+    opacity: 0.2;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float-panel {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.scroll-reveal {
+  animation: reveal-up 0.9s ease both;
+  animation-timeline: view();
+  animation-range: entry 8% cover 38%;
+}
+
+.scroll-reveal-soft {
+  animation: reveal-soft 0.8s ease both;
+  animation-timeline: view();
+  animation-range: entry 12% cover 34%;
+}
+
+.float-panel {
+  animation: float-panel 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal,
+  .scroll-reveal-soft,
+  .float-panel {
+    animation: none;
+  }
+}
