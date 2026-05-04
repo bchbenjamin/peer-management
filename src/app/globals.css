@@ -42,30 +42,6 @@ textarea:focus {
   outline-offset: 1px;
 }
 
-@keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(56px) scale(0.98);
-    filter: blur(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-}
-
-@keyframes reveal-soft {
-  from {
-    opacity: 0.2;
-    transform: translateY(32px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes float-panel {
   0%, 100% {
     transform: translateY(0);
@@ -76,15 +52,23 @@ textarea:focus {
 }
 
 .scroll-reveal {
-  animation: reveal-up 0.9s ease both;
-  animation-timeline: view();
-  animation-range: entry 8% cover 38%;
+  opacity: 0;
+  transform: translateY(48px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+  will-change: opacity, transform;
 }
 
 .scroll-reveal-soft {
-  animation: reveal-soft 0.8s ease both;
-  animation-timeline: view();
-  animation-range: entry 12% cover 34%;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.is-visible,
+.scroll-reveal-soft.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .float-panel {
@@ -96,5 +80,8 @@ textarea:focus {
   .scroll-reveal-soft,
   .float-panel {
     animation: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

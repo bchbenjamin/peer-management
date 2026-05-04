@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ScrollRevealObserver } from '@/components/scroll-reveal';
 
 export const metadata: Metadata = {
   title: 'Peer Management Platform',
@@ -20,7 +21,10 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <body className="bg-[var(--color-pitch-black)] text-[var(--color-porcelain)] font-[var(--font-inter-variable)] antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ScrollRevealObserver />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
