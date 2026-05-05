@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { authenticator } from 'otplib';
+const { authenticator } = require('otplib');
 import QRCode from 'qrcode';
 import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { authenticator } from 'otplib';
+const { authenticator } = require('otplib');
 import { getSession, createSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { normalizeTotpSecret, normalizeTotpToken } from '@/lib/totp';
