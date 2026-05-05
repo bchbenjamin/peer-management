@@ -90,3 +90,9 @@ model CommentChip {
   label String @unique
   order Int    @default(0)
 }
+
+model SystemSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

@@ -31,6 +31,13 @@ export default function SettingsPage() {
         if (session.isMaster || session.role === Role.COORDINATOR) {
           const res = await fetch('/api/settings/chips');
           if (res.ok) setChips(await res.json());
+
+          const sysRes = await fetch('/api/settings/system');
+          if (sysRes.ok) {
+            const sysData = await sysRes.json();
+            const input = document.getElementById('trustedDeviceDurationInput') as HTMLInputElement;
+            if (input) input.value = sysData.trustedDeviceDuration;
+          }
         }
       }
     } finally {
@@ -200,6 +207,38 @@ export default function SettingsPage() {
           <Button type="submit" size="md" disabled={sessionInfo?.isMaster}>Update Password</Button>
         </form>
       </Card>
+      
+      {canManageChips && (
+      <Card className="p-6">
+        <h3 className="text-[var(--text-subheading)] leading-[var(--leading-subheading)] font-medium mb-4">System Settings</h3>
+        <p className="text-sm text-[var(--color-silver-mist)] mb-6">
+          Configure global platform settings such as trusted device durations.
+        </p>
+        <div className="max-w-md">
+          <label className="block text-sm text-[var(--color-silver-mist)] mb-2">Trusted Device Duration (Days)</label>
+          <div className="flex space-x-4">
+            <Input
+              type="number"
+              min="1"
+              id="trustedDeviceDurationInput"
+              placeholder="e.g., 90"
+            />
+            <Button type="button" size="md" onClick={async () => {
+              const input = document.getElementById('trustedDeviceDurationInput') as HTMLInputElement;
+              const duration = parseInt(input.value, 10);
+              if (duration > 0) {
+                await fetch('/api/settings/system', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ trustedDeviceDuration: duration })
+                });
+                alert('Saved successfully!');
+              }
+            }}>Save</Button>
+          </div>
+        </div>
+      </Card>
+      )}
     </div>
   );
 }

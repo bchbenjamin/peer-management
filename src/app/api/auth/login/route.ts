@@ -3,10 +3,14 @@ import { prisma } from '@/lib/prisma';
 import { comparePassword } from '@/lib/auth';
 import { createSession } from '@/lib/session';
 import { Role } from '@/types';
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
+
+    const cookieStore = await cookies();
+    const isTrusted = cookieStore.get('spc_trusted_device')?.value === '1';
 
     // 1. Check Master Admin Flow
     if (
@@ -15,16 +19,15 @@ export async function POST(request: Request) {
     ) {
       const hasTotpSecret = !!process.env.MASTER_TOTP_SECRET;
 
-      // Master accounts always require MFA verification after login.
       await createSession({
         sub: 'master',
         role: Role.COORDINATOR,
         isMaster: true,
-        mfaVerified: false,
+        mfaVerified: isTrusted,
         mfaRequired: true,
       });
 
-      return NextResponse.json({ success: true, isMaster: true, requiresMfa: true, mfaConfigured: hasTotpSecret });
+      return NextResponse.json({ success: true, isMaster: true, requiresMfa: !isTrusted, mfaConfigured: hasTotpSecret });
     }
 
     // 2. Check DB Users Flow
@@ -45,11 +48,11 @@ export async function POST(request: Request) {
       sub: user.id,
       role: user.role as Role,
       isMaster: false,
-      mfaVerified: !user.totpEnabled,
+      mfaVerified: isTrusted ? true : !user.totpEnabled,
       mfaRequired: user.totpEnabled,
     });
 
-    return NextResponse.json({ success: true, isMaster: false, requiresMfa: true, mfaConfigured: user.totpEnabled });
+    return NextResponse.json({ success: true, isMaster: false, requiresMfa: !isTrusted && user.totpEnabled, mfaConfigured: user.totpEnabled });
 
   } catch (error) {
     console.error('Login error:', error);

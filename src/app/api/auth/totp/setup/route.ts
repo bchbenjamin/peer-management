@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateSecret, generateURI } from 'otplib';
+import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
@@ -25,12 +25,12 @@ export async function GET() {
         });
       }
 
-      const secret = envSecret || generateSecret();
-      const otpauthUrl = generateURI({
-        issuer: serviceName,
-        label: process.env.MASTER_USER_ID || 'admin',
+      const secret = envSecret || authenticator.generateSecret();
+      const otpauthUrl = authenticator.keyuri(
+        process.env.MASTER_USER_ID || 'admin',
+        serviceName,
         secret,
-      });
+      );
       const qrCodeUrl = await QRCode.toDataURL(otpauthUrl);
 
       return NextResponse.json({
@@ -42,7 +42,7 @@ export async function GET() {
       });
     }
 
-    const secret = generateSecret();
+    const secret = authenticator.generateSecret();
     const serviceName = 'Peer Management Platform';
 
     // Normal User Flow
@@ -66,11 +66,11 @@ export async function GET() {
       data: { totpSecret: secret },
     });
 
-    const otpauthUrl = generateURI({
-      issuer: serviceName,
-      label: user.username,
+    const otpauthUrl = authenticator.keyuri(
+      user.username,
+      serviceName,
       secret,
-    });
+    );
     const qrCodeUrl = await QRCode.toDataURL(otpauthUrl);
 
     return NextResponse.json({
